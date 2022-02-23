@@ -11,8 +11,7 @@ import (
 func main()  {
 	rootCmd := &cobra.Command{
 		Use:   "fare-estimation",
-		Short: "",
-		Long:  "",
+		Long:  "Fare Estimation Calculator Script | Beat Case Study",
 	}
 	rootCmd.AddCommand(cli.Execute())
 
