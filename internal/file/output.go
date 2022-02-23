@@ -15,7 +15,7 @@ func WriteToCsv()  {
 	csvList := [][]string{}
 	csvFile, err := os.Create("assets/result.csv")
 	if err != nil {
-		fmt.Println("failed creating file: %s", err)
+		fmt.Printf("failed creating file: %v", err)
 		os.Exit(-1)
 	}
 	defer csvFile.Close()
@@ -40,7 +40,7 @@ func WriteToCsv()  {
 
 	err = w.WriteAll(csvList)
 	if err != nil {
-		fmt.Println("failed writing file: %s", err)
+		fmt.Printf("failed writing file: %v", err)
 		os.Exit(-1)
 	}
 }

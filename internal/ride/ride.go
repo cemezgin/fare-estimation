@@ -4,8 +4,8 @@ import "time"
 
 type Ride struct {
 	ID   int
-	Lat  string
-	Long string
+	Lat  float64
+	Long float64
 	Time time.Time
 }
 

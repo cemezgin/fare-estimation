@@ -44,10 +44,22 @@ func ReadCsv(filePath string) map[int][]ride.Ride {
 			os.Exit(2)
 		}
 		tm := time.Unix(timeValue, 0)
+
+		lat, err := strconv.ParseFloat(line[1], 64)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		long, err := strconv.ParseFloat(line[2], 64)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
 		rides[id] = append(rides[id], ride.Ride{
 			ID:   id,
-			Lat:  line[1],
-			Long: line[2],
+			Lat:  lat,
+			Long: long,
 			Time: tm,
 		})
 	}

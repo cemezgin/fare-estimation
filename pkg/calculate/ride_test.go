@@ -38,10 +38,10 @@ func TestLessThanHundredKM(t *testing.T) {
 	tm4 := time.Unix(timestamp4, 0)
 
 	ridesList = append(ridesList,
-		ride.Ride{7, "37.953066", "23.735606", tm1},
-		ride.Ride{7, "37.953009", "23.735593", tm2},
-		ride.Ride{7, "37.953195", "23.736224", tm3},
-		ride.Ride{7, "37.953433", "23.736926", tm4},
+		ride.Ride{1, 37.953066, 23.735606, tm1},
+		ride.Ride{1, 37.953009, 23.735593, tm2},
+		ride.Ride{1, 37.953195, 23.736224, tm3},
+		ride.Ride{1, 37.953433, 23.736926, tm4},
 	)
 
 	tuples := []ride.RideTuples{}
@@ -83,8 +83,8 @@ func TestMoreThanHundredKM(t *testing.T) {
 	tm6 := time.Unix(timestamp6, 0)
 
 	ridesList = append(ridesList,
-		ride.Ride{8, "37.963705", "23.732530", tm5},
-		ride.Ride{8, "37.968053", "23.730544", tm6},
+		ride.Ride{8, 37.963705, 23.732530, tm5},
+		ride.Ride{8, 37.968053, 23.730544, tm6},
 	)
 
 	tuples := []ride.RideTuples{}
