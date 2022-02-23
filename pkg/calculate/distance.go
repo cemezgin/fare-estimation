@@ -4,14 +4,21 @@ import (
 	"math"
 )
 
+const radius = 6371 // Earth radius in km
+
 type Coordinates struct {
 	Latitude  float64
 	Longitude float64
 }
 
-const radius = 6371 // Earth radius in km
+type Distance struct {
+}
 
-func (origin Coordinates) Distance(destination Coordinates) float64 {
+func NewDistanceCalculator() *Distance {
+	return &Distance{}
+}
+
+func (cd Distance) Distance(origin Coordinates, destination Coordinates) float64 {
 	degreesLat := degrees2radians(destination.Latitude - origin.Latitude)
 	degreesLong := degrees2radians(destination.Longitude - origin.Longitude)
 	a := (math.Sin(degreesLat/2)*math.Sin(degreesLat/2) +

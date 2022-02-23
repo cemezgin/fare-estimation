@@ -3,6 +3,7 @@ package calculate
 import (
 	"fare-estimation/internal/ride"
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -13,6 +14,10 @@ const FARE_AMOUNT_IDLE = 11.90
 type Ride struct {
 	rideList  []ride.RideTuples
 	firstTime time.Time
+}
+
+type DistanceCalculatorInterface interface {
+	Distance(origin Coordinates, destination Coordinates) float64
 }
 
 func NewRide(rideList []ride.RideTuples, firstTime time.Time) *Ride {
@@ -59,4 +64,59 @@ func (r Ride) calculateMoving(totalDistance float64) float64 {
 
 func (r Ride) calculateIdle(totalTime float64) float64 {
 	return FARE_AMOUNT_IDLE / totalTime
+}
+
+func Filter(line []ride.Ride) *Ride {
+	tuples := []ride.RideTuples{}
+	for key, r := range line {
+		if key+1 == len(line) {
+			continue
+		}
+
+		lat, err := strconv.ParseFloat(r.Lat, 64)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		long, err := strconv.ParseFloat(r.Long, 64)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		lat2, err := strconv.ParseFloat(line[key+1].Lat, 64)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		long2, err := strconv.ParseFloat(line[key+1].Long, 64)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+
+		distanceObject := NewDistanceCalculator()
+		pointA := Coordinates{lat, long}
+		pointB := Coordinates{lat2, long2}
+		distanceCalculate := DistanceCalculatorInterface.Distance(distanceObject,pointA,pointB)
+
+		subTime := line[key+1].Time.Sub(r.Time)
+		timeDistance := subTime.Hours()
+		speedHourly := distanceCalculate / timeDistance
+
+		fmt.Println(r.Lat, r.Long, r.Time)
+		fmt.Println(line[key+1].Lat, line[key+1].Long, line[key+1].Time)
+		fmt.Println(distanceCalculate, timeDistance, speedHourly)
+		if speedHourly > 100 {
+			//@todo remove from list
+		}
+
+		tuples = append(tuples, ride.RideTuples{
+			distanceCalculate,
+			timeDistance,
+			speedHourly,
+		})
+	}
+
+	return NewRide(tuples, line[0].Time)
 }
