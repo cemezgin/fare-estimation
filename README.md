@@ -22,7 +22,7 @@ These instructions will get you a copy of the project up and running on your loc
     go test ./...
 ### Project Structure
 
-    |-assets (external input files)
+    |-assets (input, output files)
     |-cmd
 	    |-cli (cli commands to execute in project)
 	|-internal (internal codes does not to be shared)
