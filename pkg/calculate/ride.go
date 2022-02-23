@@ -25,6 +25,36 @@ func NewRide(rideList []ride.RideTuples, firstTime time.Time) *RideCalculation {
 	return &RideCalculation{firstTime: firstTime, rideList: rideList}
 }
 
+func Filter(line []ride.Ride) *RideCalculation {
+	tuples := []ride.RideTuples{}
+	for key, r := range line {
+		if key+1 == len(line) {
+			continue
+		}
+
+		distanceObject := NewDistanceCalculator()
+		pointA := Coordinates{r.Lat, r.Long}
+		pointB := Coordinates{line[key+1].Lat, line[key+1].Long}
+		distanceCalculate := DistanceCalculatorInterface.Distance(distanceObject, pointA, pointB)
+
+		subTime := line[key+1].Time.Sub(r.Time)
+		timeDistance := subTime.Hours()
+		speedHourly := distanceCalculate / timeDistance
+
+		if speedHourly > 100 {
+			//@todo remove from list
+		}
+
+		tuples = append(tuples, ride.RideTuples{
+			distanceCalculate,
+			timeDistance,
+			speedHourly,
+		})
+	}
+
+	return NewRide(tuples, line[0].Time)
+}
+
 func (r RideCalculation) FareAmount() float64 {
 	var distance float64
 	var idleTime float64
@@ -72,34 +102,4 @@ func (r RideCalculation) calculateMoving(totalDistance float64) float64 {
 
 func (r RideCalculation) calculateIdle(totalTime float64) float64 {
 	return FARE_AMOUNT_IDLE * totalTime
-}
-
-func Filter(line []ride.Ride) *RideCalculation {
-	tuples := []ride.RideTuples{}
-	for key, r := range line {
-		if key+1 == len(line) {
-			continue
-		}
-
-		distanceObject := NewDistanceCalculator()
-		pointA := Coordinates{r.Lat, r.Long}
-		pointB := Coordinates{line[key+1].Lat, line[key+1].Long}
-		distanceCalculate := DistanceCalculatorInterface.Distance(distanceObject, pointA, pointB)
-
-		subTime := line[key+1].Time.Sub(r.Time)
-		timeDistance := subTime.Hours()
-		speedHourly := distanceCalculate / timeDistance
-
-		if speedHourly > 100 {
-			//@todo remove from list
-		}
-
-		tuples = append(tuples, ride.RideTuples{
-			distanceCalculate,
-			timeDistance,
-			speedHourly,
-		})
-	}
-
-	return NewRide(tuples, line[0].Time)
 }
