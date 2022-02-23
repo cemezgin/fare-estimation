@@ -82,7 +82,6 @@ func TestMoreThanHundredKM(t *testing.T) {
 	}
 	tm6 := time.Unix(timestamp6, 0)
 
-
 	ridesList = append(ridesList,
 		ride.Ride{8, "37.963705", "23.732530", tm5},
 		ride.Ride{8, "37.968053", "23.730544", tm6},
@@ -101,4 +100,98 @@ func TestMoreThanHundredKM(t *testing.T) {
 	assert.Equal(t, tuples, Filter(ridesList).rideList)
 }
 
+func TestRide_FareAmountMinAmount(t *testing.T) {
+	tuples := []ride.RideTuples{}
 
+	timestamp1, err := strconv.ParseInt("1405587697", 10, 64)
+	if err != nil {
+		assert.Error(t, err)
+	}
+	tm1 := time.Unix(timestamp1, 0)
+
+	tuples = append(tuples,
+		ride.RideTuples{
+			0.006439786548918445,
+			0.002777777777777778,
+			2.31832315761064,
+		},
+		ride.RideTuples{
+			0.05906477219481011,
+			0.002777777777777778,
+			21.263317990131636,
+		},
+		ride.RideTuples{
+			0.06699857255258379,
+			0.002777777777777778,
+			24.119486118930162,
+		},
+	)
+
+	rc := RideCalculation{tuples, tm1}
+
+	assert.Equal(t, 3.47, rc.FareAmount())
+}
+
+func TestRide_FareAmountDay(t *testing.T) {
+	tuples := []ride.RideTuples{}
+
+	timestamp1, err := strconv.ParseInt("1405587697", 10, 64)
+	if err != nil {
+		assert.Error(t, err)
+	}
+	tm1 := time.Unix(timestamp1, 0)
+
+	tuples = append(tuples,
+		ride.RideTuples{
+			11.006439786548918445,
+			1.002777777777777778,
+			0.31832315761064,
+		},
+		ride.RideTuples{
+			12.05906477219481011,
+			1.002777777777777778,
+			1.263317990131636,
+		},
+		ride.RideTuples{
+			400.06699857255258379,
+			1.002777777777777778,
+			24.119486118930162,
+		},
+	)
+
+	rc := RideCalculation{tuples, tm1}
+
+	assert.Equal(t, 25.90816666666667, rc.FareAmount())
+}
+
+func TestRide_FareAmountNight(t *testing.T) {
+	tuples := []ride.RideTuples{}
+
+	timestamp1, err := strconv.ParseInt("1645567200", 10, 64)
+	if err != nil {
+		assert.Error(t, err)
+	}
+	tm1 := time.Unix(timestamp1, 0)
+
+	tuples = append(tuples,
+		ride.RideTuples{
+			11.006439786548918445,
+			1.002777777777777778,
+			0.31832315761064,
+		},
+		ride.RideTuples{
+			12.05906477219481011,
+			1.002777777777777778,
+			1.263317990131636,
+		},
+		ride.RideTuples{
+			400.06699857255258379,
+			1.002777777777777778,
+			24.119486118930162,
+		},
+	)
+
+	rc := RideCalculation{tuples, tm1}
+
+	assert.Equal(t, 26.469722222222224, rc.FareAmount())
+}

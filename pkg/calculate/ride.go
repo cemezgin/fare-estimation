@@ -10,8 +10,10 @@ import (
 const FARE_AMOUNT_PER_KM_DAY = 0.74
 const FARE_AMOUNT_PER_KM_NIGHT = 1.30
 const FARE_AMOUNT_IDLE = 11.90
+const MIN_FARE_AMOUNT = 3.47
+const FLAG_AMOUNT = 1.30
 
-type Ride struct {
+type RideCalculation struct {
 	rideList  []ride.RideTuples
 	firstTime time.Time
 }
@@ -20,13 +22,15 @@ type DistanceCalculatorInterface interface {
 	Distance(origin Coordinates, destination Coordinates) float64
 }
 
-func NewRide(rideList []ride.RideTuples, firstTime time.Time) *Ride {
-	return &Ride{firstTime: firstTime, rideList: rideList}
+func NewRide(rideList []ride.RideTuples, firstTime time.Time) *RideCalculation {
+	return &RideCalculation{firstTime: firstTime, rideList: rideList}
 }
 
-func (r Ride) FareAmount() float64 {
+func (r RideCalculation) FareAmount() float64 {
 	var distance float64
 	var idleTime float64
+	flag := FLAG_AMOUNT
+
 
 	for _, fare := range r.rideList {
 		if fare.SpeedHourly > 10 {
@@ -36,13 +40,19 @@ func (r Ride) FareAmount() float64 {
 		}
 	}
 
-	return r.calculateMoving(distance) + r.calculateIdle(idleTime)
+	totalAmount := r.calculateMoving(distance) + r.calculateIdle(idleTime) + flag
 
+	if totalAmount < MIN_FARE_AMOUNT {
+		return MIN_FARE_AMOUNT
+	}
+
+	return totalAmount
 }
 
-func (r Ride) calculateMoving(totalDistance float64) float64 {
+func (r RideCalculation) calculateMoving(totalDistance float64) float64 {
 	zero := "2006-01-02T00:00:00Z"
 	five := "2006-01-02T05:00:00Z"
+	var totalAmount float64
 
 	zeroTime, err := time.Parse(time.RFC3339, zero)
 	if err != nil {
@@ -54,19 +64,19 @@ func (r Ride) calculateMoving(totalDistance float64) float64 {
 	}
 
 	if r.firstTime.Hour() > zeroTime.Hour() && r.firstTime.Hour() < fiveTime.Hour() {
-		totalDistance = totalDistance * FARE_AMOUNT_PER_KM_NIGHT
+		totalAmount = (totalDistance * FARE_AMOUNT_PER_KM_NIGHT)
 	} else {
-		totalDistance = totalDistance * FARE_AMOUNT_PER_KM_DAY
+		totalAmount = (totalDistance * FARE_AMOUNT_PER_KM_DAY)
 	}
 
-	return totalDistance
+	return totalAmount
 }
 
-func (r Ride) calculateIdle(totalTime float64) float64 {
-	return FARE_AMOUNT_IDLE / totalTime
+func (r RideCalculation) calculateIdle(totalTime float64) float64 {
+	return FARE_AMOUNT_IDLE * totalTime
 }
 
-func Filter(line []ride.Ride) *Ride {
+func Filter(line []ride.Ride) *RideCalculation {
 	tuples := []ride.RideTuples{}
 	for key, r := range line {
 		if key+1 == len(line) {
@@ -104,9 +114,6 @@ func Filter(line []ride.Ride) *Ride {
 		timeDistance := subTime.Hours()
 		speedHourly := distanceCalculate / timeDistance
 
-		fmt.Println(r.Lat, r.Long, r.Time)
-		fmt.Println(line[key+1].Lat, line[key+1].Long, line[key+1].Time)
-		fmt.Println(distanceCalculate, timeDistance, speedHourly)
 		if speedHourly > 100 {
 			//@todo remove from list
 		}
