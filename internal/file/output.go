@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"os"
 )
+
 type RideAmountInterface interface {
 	FareAmount() float64
 }
 
-func WriteToCsv()  {
+func WriteToCsv() {
 	c1 := make(chan float64)
 	csvList := [][]string{}
 	csvFile, err := os.Create("assets/result.csv")

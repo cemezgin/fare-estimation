@@ -11,6 +11,6 @@ type Ride struct {
 
 type RideTuples struct {
 	DistanceCalculate float64
-	TimeDistance float64
-	SpeedHourly float64
+	TimeDistance      float64
+	SpeedHourly       float64
 }
